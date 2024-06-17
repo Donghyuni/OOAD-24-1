@@ -1,7 +1,15 @@
+
 import requests
 from datetime import datetime
 import xml.etree.ElementTree as ET
-import data_set
+
+class SingletonMeta(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            instance = super().__call__(*args, **kwargs)
+            cls._instances[cls] = instance
+        return cls._instances[cls]
 
 class Weather:
     def __init__(self, temperature, condition, other_data):
@@ -9,7 +17,7 @@ class Weather:
         self.condition = condition
         self.other_data = other_data
 
-class WeatherAPI:
+class WeatherAPI(metaclass=SingletonMeta):
     API_KEY = 'hJUMsS54Qy2VDLEueMMtIA'
     BASE_URL = 'https://apihub.kma.go.kr/api/typ01/url/kma_sfctm2.php'
     
@@ -31,13 +39,11 @@ class WeatherAPI:
         else:
             raise ConnectionError("Failed to connect to the weather API")
 
-def requestWeatherStatus() -> list[data_set.dataSet]:
+def requestWeatherStatus() -> list:
     shortWeather = WeatherAPI.get_weather_data()
     middleWeather = WeatherAPI.get_weather_data()  # For example purpose, we call the same method. Update if different endpoint
     current_date = datetime.now()
-    dataSet = [data_set.dataSet((current_date + timedelta(days=i)).strftime('%Y-%m-%d')) for i in range(8)]
-    data_set.shortXml2DataSet(shortWeather, dataSet)
-    dataSet = data_set.middleXml2DataSet(middleWeather, dataSet)
+    dataSet = [Weather(current_date + timedelta(days=i), 'condition_placeholder', 'data_placeholder') for i in range(8)]
     for i in dataSet:
-        print(str(i))
+        print(i)
     return dataSet

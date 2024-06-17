@@ -1,12 +1,27 @@
-class FashionRecommendation:
-    @staticmethod
-    def recommend_outfits(categories):
-        # 임의의 코디 추천 예시
-        outfit_combinations = []
-        for category in categories:
-            if category == "casual":
-                outfit_combinations.append("Casual Outfit: T-shirt and Jeans")
-            elif category == "formal":
-                outfit_combinations.append("Formal Outfit: Suit and Tie")
-            # 추가 카테고리 및 추천 사항 추가 가능
-        return outfit_combinations
+
+class OutfitStrategy:
+    def recommend(self, categories):
+        pass
+
+class CasualOutfitStrategy(OutfitStrategy):
+    def recommend(self, categories):
+        return ["Casual Outfit: T-shirt and Jeans"] if "casual" in categories else []
+
+class FormalOutfitStrategy(OutfitStrategy):
+    def recommend(self, categories):
+        return ["Formal Outfit: Suit and Tie"] if "formal" in categories else []
+
+class FashionContext:
+    def __init__(self, strategy: OutfitStrategy):
+        self._strategy = strategy
+
+    def set_strategy(self, strategy: OutfitStrategy):
+        self._strategy = strategy
+
+    def recommend_outfits(self, categories):
+        return self._strategy.recommend(categories)
+
+# Example usage:
+# context = FashionContext(CasualOutfitStrategy())
+# recommendations = context.recommend_outfits(["casual", "sport"])
+# print(recommendations)
